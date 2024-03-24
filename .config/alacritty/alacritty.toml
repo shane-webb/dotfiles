@@ -1,8 +1,10 @@
 import = ["~/.config/alacritty/themes/themes/solarized_dark.toml"]
 
 [window]
-padding = { x = 6, y = 6 }
+padding = { x = 8, y = 8 }
 opacity = 0.999
+# decorations = "buttonless"
+dynamic_padding = true
 
 [font]
 normal = { family = "FiraCode Nerd Font", style = "Regular" }
@@ -12,5 +14,8 @@ size = 16
 [keyboard]
 bindings = [
   { key = "Right", mods = "Alt", chars = "\u001BF" },
-  { key = "Left",  mods = "Alt", chars = "\u001BB" },
+  { key = "Left", mods = "Alt", chars = "\u001BB" },
 ]
+
+[env]
+TERM = "xterm-256color"
