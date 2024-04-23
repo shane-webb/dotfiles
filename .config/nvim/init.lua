@@ -230,7 +230,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-  'tpope/vim-surround', -- Edit surrounding characters intelligently
+  -- 'tpope/vim-surround', -- Edit surrounding characters intelligently
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -795,6 +795,21 @@ require('lazy').setup({
       statusline.section_location = function()
         return '%2l:%-2v'
       end
+
+      -- Autopairs
+      --
+      -- should work as expected with the default config
+      local pairs = require('mini.pairs').setup()
+
+      -- File navigation, replacement for the defaklt 'netrw' that comes with Neovim
+      -- - j/k navigate up and down
+      -- - l move into directory or open file
+      -- - h move out of directory (H to move and close previous directory)
+      -- - g? to open the help menu
+      -- local files = require('mini.files').setup()
+      -- local minifiles_toggle = function()
+      --   if not MiniFiles.close() then MiniFiles.open() end
+      -- end
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
