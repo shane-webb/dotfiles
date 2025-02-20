@@ -207,6 +207,18 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- Run a specific batch file for hotreloading
+vim.api.nvim_create_user_command(
+  'W',
+  function()
+    vim.cmd 'w' -- Save the current file
+    vim.cmd 'pwd'
+    -- vim.cmd '!.\\hot_reload.bat' -- Run the batch file
+    -- :w | execute '!if exist build.bat (call build.bat) else (cd .. && if exist build.bat (call build.bat) else (cd .. && if exist build.bat (call build.bat) else (cd .. && if exist build.bat (call build.bat) else (echo build.bat not found))))'
+  end,
+  { desc = 'Save and run build.bat' } -- Optional description for the command
+)
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -397,6 +409,9 @@ require('lazy').setup({
           --  For example, in C this would take you to the header
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
+          -- open signature_help window
+          map('<C-s>', vim.lsp.buf.signature_help, '[Signature Help]')
+
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
           --    See `:help CursorHold` for information about when this is executed
@@ -434,7 +449,14 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
+        ols = {
+          cmd = { 'C:/Users/shane/ols/ols.exe' },
+          filetypes = { 'odin' },
+          root_dir = require('lspconfig').util.root_pattern('ols.json', 'odinfmt.json', '.git', '*.odin'),
+          capabilities = capabilities,
+        },
         -- clangd = {},
+        glsl_analyzer = {},
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
@@ -625,13 +647,21 @@ require('lazy').setup({
     end,
   },
 
+  {
+    -- Some colorschemes require this plugin
+    'tjdevries/colorbuddy.nvim',
+  },
+
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is
     --
+    --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`
     -- 'folke/tokyonight.nvim',
-    'craftzdog/solarized-osaka.nvim',
+    'svrana/neosolarized.nvim',
+    -- 'karoliskoncevicius/distilled-vim',
+    -- 'craftzdog/solarized-osaka.nvim',
     -- require('solarized-osaka.nvim').setup {
     --   styles = {
     --     keywords = { italic = true },
@@ -645,7 +675,9 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'solarized-osaka'
+      vim.cmd.colorscheme 'neosolarized'
+      -- vim.cmd.colorscheme 'distilled'
+      -- vim.cmd.colorscheme 'solarized-osaka'
       -- vim.cmd.colorscheme 'tokyonight'
 
       -- You can configure highlights by doing something like
@@ -718,7 +750,7 @@ require('lazy').setup({
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
-        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc' },
+        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'glsl' },
         -- Autoinstall languages that are not installed
         auto_install = true,
         highlight = { enable = true },
@@ -773,6 +805,23 @@ require('lazy').setup({
     },
   },
 })
+
+-- Define the function to show LSP capabilities
+function ShowLspCapabilities()
+  local clients = vim.lsp.get_active_clients()
+  if next(clients) == nil then
+    print 'No LSP clients connected'
+    return
+  end
+
+  for _, client in ipairs(clients) do
+    print('Capabilities for client: ' .. client.name)
+    print(vim.inspect(client.server_capabilities))
+  end
+end
+
+-- Create the user command
+vim.api.nvim_create_user_command('LspCapabilities', ShowLspCapabilities, {})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
