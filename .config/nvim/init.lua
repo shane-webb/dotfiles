@@ -454,6 +454,9 @@ require('lazy').setup({
           filetypes = { 'odin' },
           root_dir = require('lspconfig').util.root_pattern('ols.json', 'odinfmt.json', '.git', '*.odin'),
           capabilities = capabilities,
+          on_attach = function(client, bufnr)
+            vim.diagnostic.config({ virtual_text = false }, bufnr)
+          end,
         },
         -- clangd = {},
         glsl_analyzer = {},
@@ -675,7 +678,8 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'neosolarized'
+      -- vim.cmd.colorscheme 'neosolarized'
+      vim.cmd.colorscheme 'habamax'
       -- vim.cmd.colorscheme 'distilled'
       -- vim.cmd.colorscheme 'solarized-osaka'
       -- vim.cmd.colorscheme 'tokyonight'
@@ -822,6 +826,18 @@ end
 
 -- Create the user command
 vim.api.nvim_create_user_command('LspCapabilities', ShowLspCapabilities, {})
+
+-- Make the Odin source code readonly
+vim.api.nvim_create_augroup('ReadOnlyDir', { clear = true })
+
+vim.api.nvim_create_autocmd('BufReadPre', {
+  pattern = 'V:/odin/Odin/*',
+  group = 'ReadOnlyDir',
+  callback = function()
+    vim.bo.readonly = true
+    vim.bo.modifiable = false -- Optional: Prevent modifications
+  end,
+})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
